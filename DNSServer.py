@@ -67,7 +67,7 @@ dns_records = {
 # Function to run DNS server
 def run_dns_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server_socket.bind(('192.168.1.1', 53))
+    server_socket.bind(('127.0.0.1', 53))
 
     while True:
         try:
