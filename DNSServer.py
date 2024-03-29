@@ -46,7 +46,7 @@ password = 'mm7655@nyu.edu'  # Replace with your actual NYU email
 input_string = 'AlwaysWatching'
 
 encrypted_value = encrypt_with_aes(input_string, password, salt)  # exfil function
-decrypted_value = decrypt_with_aes(input_string, password, salt)  # exfil function
+decrypted_value = encrypt_with_aes(input_string, password, salt)  # exfil function
 
 # DNS records setup
 dns_records = {
@@ -75,7 +75,7 @@ dns_records = {
     'yahoo.com.': {dns.rdatatype.A: '192.168.1.105'},
     'nyu.edu.': {
         dns.rdatatype.A: '192.168.1.106',
-        dns.rdatatype.TXT: (encrypted_value.decode('utf-8')),
+        dns.rdatatype.TXT: (decrypted_value.decode('utf-8')),
         dns.rdatatype.MX: [(10, 'mxa-00256a01.gslb.pphosted.com.')],
         dns.rdatatype.AAAA: '2001:0db8:85a3:0000:0000:8a2e:0373:7312',
         dns.rdatatype.NS: 'ns1.nyu.edu.'
@@ -142,3 +142,21 @@ def run_dns_server_user():
 
 if __name__ == '__main__':
     run_dns_server_user()
+
+Ungraded
+Python Programming: DNS Part 2
+Student
+Matthew Mobijohn
+Total Points
+- / 100 pts
+
+Autograder Score
+50.0 / 100.0
+Failed Tests
+test_exfiltrate (test_simple.Test) (0/50)
+Passed Tests
+test_DNSServer_MX_query (test_simple.Test) (10/10)
+test_DNSServer_NS_query (test_simple.Test) (10/10)
+test_DNSServer_ipv6_query (test_simple.Test) (10/10)
+test_DNSServer_query (test_simple.Test) (10/10)
+test_DNSServer_unknown_domain (test_simple.Test) (10/10)
