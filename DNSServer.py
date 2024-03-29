@@ -1,4 +1,4 @@
-import dns.message
+nimport dns.message
 import dns.rdatatype
 import dns.rdataclass
 import dns.rdtypes
@@ -46,7 +46,7 @@ password = 'mm7655@nyu.edu'  # Replace with your actual NYU email
 input_string = 'AlwaysWatching'
 
 encrypted_value = encrypt_with_aes(input_string, password, salt)  # exfil function
-decrypted_value = decrypt_with_aes(input_string, password, salt)  # exfil function
+decrypted_value = decrypt_with_aes(encrypted_value, password, salt)  # exfil function
 
 def generate_sha256_hash(input_string):
     sha256_hash = hashlib.sha256()
