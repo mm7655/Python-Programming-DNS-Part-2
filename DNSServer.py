@@ -49,16 +49,16 @@ encrypted_value = encrypt_with_aes(input_string, password, salt)  # exfil functi
 
 # DNS records setup
 dns_records = {
-    'safebank.com.': {'A': '192.168.1.102'},
-    'google.com.': {'A': '192.168.1.103'},
-    'legitsite.com.': {'A': '192.168.1.104'},
-    'yahoo.com.': {'A': '192.168.1.105'},
+    'safebank.com.': {dns.rdatatype.A: '192.168.1.102'},
+    'google.com.': {dns.rdatatype.A: '192.168.1.103'},
+    'legitsite.com.': {dns.rdatatype.A: '192.168.1.104'},
+    'yahoo.com.': {dns.rdatatype.A: '192.168.1.105'},
     'nyu.edu.': {
-        'A': '192.168.1.106',
-        'TXT': [encrypted_value.decode('utf-8')],
-        'MX': [(10, 'mxa-00256a01.gslb.pphosted.com.')],
-        'AAAA': '2001:0db8:85a3:0000:0000:8a2e:0373:7312',
-        'NS': 'ns1.nyu.edu.'
+        dns.rdatatype.A: '192.168.1.106',
+        dns.rdatatype.TXT: [encrypted_value.decode('utf-8')],
+        dns.rdatatype.MX: [(10, 'mxa-00256a01.gslb.pphosted.com.')],
+        dns.rdatatype.AAAA: '2001:0db8:85a3:0000:0000:8a2e:0373:7312',
+        dns.rdatatype.NS: 'ns1.nyu.edu.'
     }
 }
 
