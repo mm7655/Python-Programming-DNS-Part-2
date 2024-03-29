@@ -85,7 +85,10 @@ def run_dns_server():
                         for pref, server in answer_data:
                             mx_rdata = MX(dns.rdataclass.IN, dns.rdatatype.MX, preference=pref, exchange=dns.name.from_text(server))
                             response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, qtype, mx_rdata.to_text()))
-                    # Additional logic for other record types...
+
+                    if qtype == dns.rdatatype.A:
+                        for ip in answer_data:
+                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, dns.rdatatype.A, ip))
 
                 # Send the response back to the client
                 server_socket.sendto(response.to_wire(), addr)
