@@ -105,6 +105,14 @@ def run_dns_server():
                         for pref, server in answer_data:
                             mx_rdata = MX(dns.rdataclass.IN, dns.rdatatype.MX, preference=pref, exchange=dns.name.from_text(server))
                             response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, qtype, mx_rdata.to_text()))
+
+                    elif qtype == dns.rdatatype.TXT:
+                    # Assuming answer_data is a list of strings for TXT records
+                        for txt_record in answer_data:
+                    # Wrap the TXT record content in quotes, necessary for some DNS libraries
+                            txt_rdata = dns.rdata.from_text(dns.rdataclass.IN, dns.rdatatype.TXT, f'"{txt_record}"')
+                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, qtype, txt_rdata.to_text()))
+                    
                     else:
                         if isinstance(answer_data, str):
                             rdata_list = [dns.rdata.from_text(dns.rdataclass.IN, qtype, answer_data)]
