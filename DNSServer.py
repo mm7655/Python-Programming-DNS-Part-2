@@ -67,18 +67,16 @@ dns_records = {
 # Function to run DNS server
 def run_dns_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server_socket.bind(('127.0.0.1', 53))
+    server_socket.bind(('127.0.0.1', 53))  # Use localhost for testing
 
     while True:
         try:
+            # Wait for incoming DNS requests
             data, addr = server_socket.recvfrom(1024)
+            # Parse the request using the `dns.message.from_wire` method
             request = dns.message.from_wire(data)
-
-            response = dns.message.Message()
-            response.id = request.id
-            response.flags = dns.flags.QR | dns.flags.AA | dns.flags.RD
-            response.set_opcode(dns.opcode.QUERY)
-            response.set_rcode(0)  # No error
+            # Create a response message
+            response = dns.message.make_response(request)
 
             if request.question:
                 question = request.question[0]
@@ -86,20 +84,31 @@ def run_dns_server():
                 qtype = question.rdtype
 
                 if qname in dns_records and qtype in dns_records[qname]:
-                    record_data = dns_records[qname][qtype]
-                    if isinstance(record_data, list):  # For TXT and MX records which are lists
-                        for item in record_data:
-                            if qtype == dns.rdatatype.MX:
-                                preference, exchange = item
-                                rd = dns.rdata.from_text(dns.rdataclass.IN, qtype, f'{preference} {exchange}')
-                            else:  # For TXT records
-                                rd = dns.rdata.from_text(dns.rdataclass.IN, qtype, item)
-                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, qtype, rd.to_text()))
-                    else:  # For A, AAAA, NS records which are single strings
-                        rd = dns.rdata.from_text(dns.rdataclass.IN, qtype, record_data)
-                        response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, qtype, rd.to_text()))
+                    answer_data = dns_records[qname][qtype]
+                    rdata_list = []
 
-            server_socket.sendto(response.to_wire(), addr)
+                    if qtype == dns.rdatatype.MX:
+                        for pref, server in answer_data:
+                            rdata_list.append(MX(dns.rdataclass.IN, qtype, preference=pref, exchange=dns.name.from_text(server)))
+                    elif qtype == dns.rdatatype.SOA:
+                        mname, rname, serial, refresh, retry, expire, minimum = answer_data
+                        rdata = SOA(dns.rdataclass.IN, dns.rdatatype.SOA, mname=dns.name.from_text(mname), rname=dns.name.from_text(rname), serial=serial, refresh=refresh, retry=retry, expire=expire, minimum=minimum)
+                        rdata_list.append(rdata)
+                    else:
+                        if isinstance(answer_data, str):
+                            rdata_list = [dns.rdata.from_text(dns.rdataclass.IN, qtype, answer_data)]
+                        else:
+                            rdata_list = [dns.rdata.from_text(dns.rdataclass.IN, qtype, item) for item in answer_data]
+
+                    for rdata in rdata_list:
+                        response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, qtype, rdata.to_text()))
+
+                # Set the response flags
+                response.flags |= dns.flags.AA
+
+                # Send the response back to the client
+                print("Responding to request for:", qname)
+                server_socket.sendto(response.to_wire(), addr)
         except KeyboardInterrupt:
             print('\nExiting...')
             server_socket.close()
