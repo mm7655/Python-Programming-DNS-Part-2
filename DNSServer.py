@@ -46,7 +46,7 @@ password = 'mm7655@nyu.edu'  # Replace with your actual NYU email
 input_string = 'AlwaysWatching'
 
 encrypted_value = encrypt_with_aes(input_string, password, salt)  # exfil function
-decrypted_value = encrypt_with_aes(input_string, password, salt)  # exfil function
+decrypted_value = decrypt_with_aes(input_string, password, salt)  # exfil function
 
 # DNS records setup
 dns_records = {
