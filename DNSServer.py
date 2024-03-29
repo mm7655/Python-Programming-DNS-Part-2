@@ -81,10 +81,40 @@ def run_dns_server():
                 if qname in dns_records and qtype in dns_records[qname]:
                     answer_data = dns_records[qname][qtype]
 
-                    if qtype == dns.rdatatype.MX:
+#                    if qtype == dns.rdatatype.MX:
+#                        for pref, server in answer_data:
+#                            mx_rdata = MX(dns.rdataclass.IN, dns.rdatatype.MX, preference=pref, exchange=dns.name.from_text(server))
+#                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, qtype, mx_rdata.to_text()))
+
+                                    # Append A records
+                    if qtype == dns.rdatatype.A:
+                        for ip in answer_data:
+                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, dns.rdatatype.A, ip))
+                    
+                    # Append AAAA records
+                    elif qtype == dns.rdatatype.AAAA:
+                        for ip in answer_data:
+                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, dns.rdatatype.AAAA, ip))
+                    
+                    # Append TXT records
+                    elif qtype == dns.rdatatype.TXT:
+                        # Ensure TXT data is a list, even if only one value
+                        if isinstance(answer_data, str):
+                            answer_data = [answer_data]
+                        for txt in answer_data:
+                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, dns.rdatatype.TXT, f'"{txt}"'))
+
+                    # Append NS records
+                    elif qtype == dns.rdatatype.NS:
+                        for ns in answer_data:
+                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, dns.rdatatype.NS, ns))
+
+                    # Append MX records (Your original MX handling logic is correct)
+                    elif qtype == dns.rdatatype.MX:
                         for pref, server in answer_data:
                             mx_rdata = MX(dns.rdataclass.IN, dns.rdatatype.MX, preference=pref, exchange=dns.name.from_text(server))
                             response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, qtype, mx_rdata.to_text()))
+
 
 
                 # Send the response back to the client
