@@ -71,7 +71,7 @@ def run_dns_server():
 
     while True:
         try:
-            data, addr = server_socket.recvfrom(512)
+            data, addr = server_socket.recvfrom(1024)
             request = dns.message.from_wire(data)
 
             response = dns.message.Message()
@@ -113,4 +113,17 @@ def run_dns_server_user():
     def user_input():
         while True:
             cmd = input()
-            if cmd.lower
+            if cmd.lower() == 'q':
+                print('Quitting...')
+                os.kill(os.getpid(), signal.SIGINT)
+
+    input_thread = threading.Thread(target=user_input)
+    input_thread.daemon = True
+    input_thread.start()
+    run_dns_server()
+
+
+if __name__ == '__main__':
+    run_dns_server_user()
+    #print("Encrypted Value:", encrypted_value)
+    #print("Decrypted Value:", decrypted_value)
