@@ -88,7 +88,7 @@ def run_dns_server():
 
                     if qtype == dns.rdatatype.A:
                         for ip_address in answer_data:
-                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, dns.rdatatype.A, ip))
+                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, dns.rdatatype.A, ip_address))
 
                 # Send the response back to the client
                 server_socket.sendto(response.to_wire(), addr)
