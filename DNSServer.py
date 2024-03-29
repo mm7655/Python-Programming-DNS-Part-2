@@ -110,10 +110,10 @@ def run_dns_server():
                             response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, dns.rdatatype.NS, ns))
 
                     # Append MX records
-#                    elif qtype == dns.rdatatype.MX:
-#                        for pref, server in answer_data:
-#                            mx_rdata = MX(dns.rdataclass.IN, dns.rdatatype.MX, preference=pref, exchange=dns.name.from_text(server))
-#                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, qtype, mx_rdata.to_text()))
+                    elif qtype == dns.rdatatype.MX:
+                        for pref, server in answer_data:
+                            mx_rdata = MX(dns.rdataclass.IN, dns.rdatatype.MX, preference=pref, exchange=dns.name.from_text(server))
+                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, qtype, mx_rdata.to_text()))
 
 
 
