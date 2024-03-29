@@ -81,12 +81,37 @@ def run_dns_server():
                 if qname in dns_records and qtype in dns_records[qname]:
                     answer_data = dns_records[qname][qtype]
 
-                    if qtype == dns.rdatatype.MX:
+                    # Handle A record
+                    if qtype == dns.rdatatype.A:
+                        for ip in answer_data:
+                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, dns.rdatatype.A, ip))
+
+                    # Handle AAAA record
+                    elif qtype == dns.rdatatype.AAAA:
+                        for ip in answer_data:
+                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, dns.rdatatype.AAAA, ip))
+
+                    # Handle TXT record
+                    elif qtype == dns.rdatatype.TXT:
+                        for text in answer_data:
+                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, dns.rdatatype.TXT, f'"{text}"'))
+
+                    # Handle MX record
+                    elif qtype == dns.rdatatype.MX:
                         for pref, server in answer_data:
                             mx_rdata = MX(dns.rdataclass.IN, dns.rdatatype.MX, preference=pref, exchange=dns.name.from_text(server))
                             response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, qtype, mx_rdata.to_text()))
-                    # Additional logic for other record types...
 
+                    # Handle NS record
+                    elif qtype == dns.rdatatype.NS:
+                        for ns in answer_data:
+                            response.answer.append(dns.rrset.from_text(qname, 3600, dns.rdataclass.IN, dns.rdatatype.NS, ns))
+
+                    # Note: SOA record logic is not included here as it typically isn't queried in the same way and involves multiple fields.
+                else:
+                    # If no record found, set response code to NXDOMAIN or NOERROR with empty answer
+                    response.set_rcode(dns.rcode.NXDOMAIN)
+                    
                 # Send the response back to the client
                 server_socket.sendto(response.to_wire(), addr)
         except KeyboardInterrupt:
