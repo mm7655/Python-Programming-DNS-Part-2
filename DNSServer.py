@@ -1,19 +1,23 @@
 import dns.message
 import dns.rdatatype
 import dns.rdataclass
+import dns.rdtypes
+import dns.rdtypes.ANY
+from dns.rdtypes.ANY.MX import MX
+from dns.rdtypes.ANY.SOA import SOA
 import dns.rdata
-from dns.rdtypes.IN.MX import MX  # Corrected import for MX
-from dns.rdtypes.ANY.SOA import SOA  # Corrected import for SOA
 import socket
 import threading
 import signal
 import os
 import sys
+
 import hashlib
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import base64
+import ast
 
 # Encryption and decryption utilities
 def generate_aes_key(password, salt):
