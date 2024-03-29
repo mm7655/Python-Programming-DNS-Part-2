@@ -34,24 +34,33 @@ def decrypt_with_aes(encrypted_data, password, salt):
     f = Fernet(key)
     return f.decrypt(encrypted_data).decode('utf-8')
 
+
 # Prepare encryption parameters
 salt = b'Tandon'
 password = 'mm7655@nyu.edu'  # Replace with your actual NYU email
 input_string = 'AlwaysWatching'
-encrypted_value = encrypt_with_aes(input_string, password, salt)
+
+encrypted_value = encrypt_with_aes(input_string, password, salt) # exfil function
+decrypted_value = decrypt_with_aes(encrypted_value, password, salt)  # exfil function
+
+def generate_sha256_hash(input_string):
+    sha256_hash = hashlib.sha256()
+    sha256_hash.update(input_string.encode('utf-8'))
+    return sha256_hash.hexdigest()
+
 
 # DNS records setup
 dns_records = {
-    'safebank.com.': {'A': '192.168.1.102'},
-    'google.com.': {'A': '192.168.1.103'},
-    'legitsite.com.': {'A': '192.168.1.104'},
-    'yahoo.com.': {'A': '192.168.1.105'},
+    'safebank.com.': {dns.rdatatype.A: '192.168.1.102'},
+    'google.com.': {dns.rdatatype.A: '192.168.1.103'},
+    'legitsite.com.': {dns.rdatatype.A: '192.168.1.104'},
+    'yahoo.com.': {dns.rdatatype.A: '192.168.1.105'},
     'nyu.edu.': {
-        'A': '192.168.1.106',
-        'TXT': [encrypted_value.decode('utf-8')],
-        'MX': [(10, 'mxa-00256a01.gslb.pphosted.com.')],
-        'AAAA': '2001:0db8:85a3:0000:0000:8a2e:0373:7312',
-        'NS': 'ns1.nyu.edu.'
+        dns.rdatatype.A: '192.168.1.106',
+        dns.rdatatype.TXT: [encrypted_value.decode('utf-8')],
+        dns.rdatatype.MX: [(10, 'mxa-00256a01.gslb.pphosted.com.')],
+        dns.rdatatype.AAAA: '2001:0db8:85a3:0000:0000:8a2e:0373:7312',
+        dns.rdatatype.NS: 'ns1.nyu.edu.'
     }
 }
 
