@@ -43,7 +43,7 @@ def decrypt_with_aes(encrypted_data, password, salt):
 # Prepare encryption parameters
 salt = b'Tandon'
 password = 'mm7655@nyu.edu'  # Replace with your actual NYU email
-input_string = "AlwaysWatching"
+input_string = 'AlwaysWatching'
 
 encrypted_value = encrypt_with_aes(input_string, password, salt)  # exfil function
 
@@ -55,7 +55,7 @@ dns_records = {
     'yahoo.com.': {dns.rdatatype.A: '192.168.1.105'},
     'nyu.edu.': {
         dns.rdatatype.A: '192.168.1.106',
-        dns.rdatatype.TXT: [encrypted_value.decode('utf-8')],
+        dns.rdatatype.TXT: (encrypted_value.decode('utf-8')),
         dns.rdatatype.MX: [(10, 'mxa-00256a01.gslb.pphosted.com.')],
         dns.rdatatype.AAAA: '2001:0db8:85a3:0000:0000:8a2e:0373:7312',
         dns.rdatatype.NS: 'ns1.nyu.edu.'
